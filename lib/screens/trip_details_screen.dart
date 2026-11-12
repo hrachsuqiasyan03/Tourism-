@@ -6,7 +6,6 @@ import '../models/trip.dart';
 import '../services/trip_repository.dart';
 import 'create_trip_screen.dart';
 import 'destination_selection_screen.dart';
-import 'map.dart';
 import 'place_details_screen.dart';
 
 class TripDetailsScreen extends StatefulWidget {
@@ -75,17 +74,6 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
     TripRepository.update(_trip);
     setState(() => _dayIndex = math.min(_dayIndex, _trip.days.length - 1));
   }
-
-  Future<void> _openMap() => Navigator.push<void>(
-    context,
-    MaterialPageRoute(
-      builder: (_) => MapScreen(
-        selectedPlace: _trip.places.isEmpty ? null : _trip.places.first,
-        tripPlaces: _trip.places,
-        tripName: '${_trip.name} · Քարտեզ',
-      ),
-    ),
-  );
 
   Future<void> _visitActions(TripPlace visit) async {
     final action = await showModalBottomSheet<String>(
@@ -311,11 +299,6 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
     appBar: AppBar(
       title: Text(_trip.name, maxLines: 1, overflow: TextOverflow.ellipsis),
       actions: [
-        IconButton(
-          tooltip: 'Քարտեզ',
-          onPressed: _openMap,
-          icon: const Icon(Icons.map_outlined),
-        ),
         IconButton(
           tooltip: 'Խմբագրել',
           onPressed: _editTrip,

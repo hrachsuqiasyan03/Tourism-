@@ -18,6 +18,10 @@ class VirtualTourismApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
         scaffoldBackgroundColor: const Color(0xFFF7F7F2),
+        textTheme: _comfortableTextTheme(Typography.material2021().black),
+        primaryTextTheme: _comfortableTextTheme(
+          Typography.material2021().white,
+        ),
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color(0xFF17453D),
           primary: const Color(0xFF17453D),
@@ -33,6 +37,8 @@ class VirtualTourismApp extends StatelessWidget {
             color: Colors.white,
             fontSize: 20,
             fontWeight: FontWeight.w700,
+            letterSpacing: 0.2,
+            height: 1.35,
           ),
         ),
         cardTheme: CardThemeData(
@@ -75,6 +81,8 @@ class VirtualTourismApp extends StatelessWidget {
               fontWeight: states.contains(WidgetState.selected)
                   ? FontWeight.w700
                   : FontWeight.w500,
+              letterSpacing: 0.2,
+              height: 1.35,
             ),
           ),
         ),
@@ -94,6 +102,27 @@ class VirtualTourismApp extends StatelessWidget {
     );
   }
 }
+
+TextTheme _comfortableTextTheme(TextTheme theme) => theme.copyWith(
+  displayLarge: _comfortable(theme.displayLarge),
+  displayMedium: _comfortable(theme.displayMedium),
+  displaySmall: _comfortable(theme.displaySmall),
+  headlineLarge: _comfortable(theme.headlineLarge),
+  headlineMedium: _comfortable(theme.headlineMedium),
+  headlineSmall: _comfortable(theme.headlineSmall),
+  titleLarge: _comfortable(theme.titleLarge),
+  titleMedium: _comfortable(theme.titleMedium),
+  titleSmall: _comfortable(theme.titleSmall),
+  bodyLarge: _comfortable(theme.bodyLarge),
+  bodyMedium: _comfortable(theme.bodyMedium),
+  bodySmall: _comfortable(theme.bodySmall),
+  labelLarge: _comfortable(theme.labelLarge),
+  labelMedium: _comfortable(theme.labelMedium),
+  labelSmall: _comfortable(theme.labelSmall),
+);
+
+TextStyle? _comfortable(TextStyle? style) =>
+    style?.copyWith(letterSpacing: 0.2, height: 1.35);
 
 /// Keeps touchscreen scrolling and also allows mouse dragging on desktop/web.
 class AppScrollBehavior extends MaterialScrollBehavior {

@@ -24,6 +24,6 @@ Run `flutter pub get`, then `flutter run`. Location is requested only when **My 
 
 ## Trip planner
 
-The Trips tab reuses the existing Armenian place catalog and OpenStreetMap map. Trips support date and preference setup, per-day destination selection and reordering, visit times and notes, expense tracking in AMD, and trip sharing by copying a text itinerary. Driving routes are requested from the public OSRM demo service when a trip map is opened; a failed request is shown in the map rather than silently treated as a road route.
+The Trips tab reuses the existing Armenian place catalog. Trips support date and preference setup, per-day destination selection and reordering, visit times and notes, expense tracking in AMD, and trip sharing by copying a text itinerary. The Trips screens do not include map or route functionality; the existing standalone map remains available in the main navigation.
 
 This project currently has no trip backend API. Trip data is kept in memory for the current app session and is **not permanently saved**.
