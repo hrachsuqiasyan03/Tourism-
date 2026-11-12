@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../models/trip.dart';
 import '../services/trip_repository.dart';
 import 'create_trip_screen.dart';
+import 'smart_trip_screen.dart';
 import 'trip_details_screen.dart';
 
 class MyTripsScreen extends StatefulWidget {
@@ -23,6 +24,19 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
       MaterialPageRoute(builder: (_) => const CreateTripScreen()),
     );
     if (trip != null) TripRepository.add(trip);
+  }
+
+  Future<void> _generateTrip() async {
+    final trip = await Navigator.push<Trip>(
+      context,
+      MaterialPageRoute(builder: (_) => const SmartTripScreen()),
+    );
+    if (trip == null || !mounted) return;
+    TripRepository.add(trip);
+    await Navigator.push<void>(
+      context,
+      MaterialPageRoute(builder: (_) => TripDetailsScreen(trip: trip)),
+    );
   }
 
   Future<void> _editTrip(Trip trip) async {
@@ -86,6 +100,11 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
       title: const Text('Իմ ճանապարհորդությունները'),
       actions: [
         IconButton(
+          onPressed: _generateTrip,
+          tooltip: 'Ստեղծել առաջարկով',
+          icon: const Icon(Icons.auto_awesome_outlined),
+        ),
+        IconButton(
           onPressed: _createTrip,
           tooltip: 'Նոր ճանապարհորդություն',
           icon: const Icon(Icons.add_rounded),
@@ -110,6 +129,23 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
             return CustomScrollView(
               slivers: [
                 SliverToBoxAdapter(child: _summary(trips)),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(18, 0, 18, 12),
+                    child: OutlinedButton.icon(
+                      onPressed: _generateTrip,
+                      icon: const Icon(Icons.auto_awesome),
+                      label: const Text(
+                        'Ստեղծել ուղևորություն ըստ հետաքրքրությունների',
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: _forest,
+                        padding: const EdgeInsets.symmetric(vertical: 13),
+                        side: const BorderSide(color: Color(0xFFB7CCC1)),
+                      ),
+                    ),
+                  ),
+                ),
                 SliverToBoxAdapter(
                   child: SizedBox(
                     height: 56,
@@ -513,6 +549,12 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
             onPressed: _createTrip,
             icon: const Icon(Icons.add),
             label: const Text('Ստեղծել առաջին ուղևորությունը'),
+          ),
+          const SizedBox(height: 8),
+          OutlinedButton.icon(
+            onPressed: _generateTrip,
+            icon: const Icon(Icons.auto_awesome),
+            label: const Text('Ստեղծել անհատական առաջարկով'),
           ),
         ],
       ),

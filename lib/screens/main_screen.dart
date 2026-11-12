@@ -4,7 +4,6 @@ import 'home_screen.dart';
 import 'search_screen.dart';
 import 'favorites_screen.dart';
 import 'profile_screen.dart';
-import 'map.dart';
 import 'my_trips_screen.dart';
 
 class MainScreen extends StatefulWidget {
@@ -22,8 +21,6 @@ class _MainScreenState extends State<MainScreen> {
 
     SearchScreen(),
 
-    MapScreen(),
-
     MyTripsScreen(),
 
     FavoritesScreen(),
@@ -38,7 +35,7 @@ class _MainScreenState extends State<MainScreen> {
 
       bottomNavigationBar: NavigationBar(
         selectedIndex: currentIndex,
-        labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
 
         onDestinationSelected: (index) {
           setState(() {
@@ -57,12 +54,6 @@ class _MainScreenState extends State<MainScreen> {
             icon: Icon(Icons.search_outlined),
             selectedIcon: Icon(Icons.search),
             label: 'Որոնում',
-          ),
-
-          NavigationDestination(
-            icon: Icon(Icons.map_outlined),
-            selectedIcon: Icon(Icons.map),
-            label: 'Քարտեզ',
           ),
 
           NavigationDestination(

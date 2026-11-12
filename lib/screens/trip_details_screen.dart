@@ -252,6 +252,19 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
           ? ''
           : _trip.estimatedBudget.toStringAsFixed(0),
     );
+    void saveBudget(BuildContext dialogContext) {
+      final parsed = _parseMoney(controller.text);
+      if (parsed == null || parsed < 0) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Մուտքագրեք վավեր՝ զրոյից ոչ պակաս գումար։'),
+          ),
+        );
+        return;
+      }
+      Navigator.pop(dialogContext, parsed);
+    }
+
     final value = await showDialog<double>(
       context: context,
       builder: (context) => AlertDialog(
@@ -260,6 +273,8 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
           controller: controller,
           autofocus: true,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          textInputAction: TextInputAction.done,
+          onSubmitted: (_) => saveBudget(context),
           decoration: const InputDecoration(
             prefixText: '֏ ',
             hintText: 'Օրինակ՝ 250000',
@@ -271,18 +286,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
             child: const Text('Չեղարկել'),
           ),
           FilledButton(
-            onPressed: () {
-              final parsed = double.tryParse(controller.text.trim());
-              if (parsed == null || !parsed.isFinite || parsed < 0) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Մուտքագրեք վավեր՝ զրոյից ոչ պակաս գումար։'),
-                  ),
-                );
-                return;
-              }
-              Navigator.pop(context, parsed);
-            },
+            onPressed: () => saveBudget(context),
             child: const Text('Պահպանել'),
           ),
         ],
@@ -906,8 +910,28 @@ class _ExpenseDialogState extends State<_ExpenseDialog> {
     super.dispose();
   }
 
+  void _save() {
+    final amount = _parseMoney(_amount.text);
+    if (amount == null || amount <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Մուտքագրեք դրական գումար։')),
+      );
+      return;
+    }
+    Navigator.pop(
+      context,
+      TripExpense(
+        category: _category,
+        amount: amount,
+        description: _description.text.trim(),
+        date: _date,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) => AlertDialog(
+    scrollable: true,
     title: Text(widget.expense == null ? 'Նոր ծախս' : 'Խմբագրել ծախսը'),
     content: SingleChildScrollView(
       child: Column(
@@ -931,6 +955,7 @@ class _ExpenseDialogState extends State<_ExpenseDialog> {
           TextField(
             controller: _amount,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            textInputAction: TextInputAction.next,
             decoration: const InputDecoration(
               labelText: 'Գումար (AMD)',
               prefixText: '֏ ',
@@ -939,6 +964,7 @@ class _ExpenseDialogState extends State<_ExpenseDialog> {
           const SizedBox(height: 12),
           TextField(
             controller: _description,
+            textInputAction: TextInputAction.done,
             decoration: const InputDecoration(labelText: 'Նկարագրություն'),
           ),
         ],
@@ -949,27 +975,25 @@ class _ExpenseDialogState extends State<_ExpenseDialog> {
         onPressed: () => Navigator.pop(context),
         child: const Text('Չեղարկել'),
       ),
-      FilledButton(
-        onPressed: () {
-          final amount = double.tryParse(_amount.text.trim());
-          if (amount == null || !amount.isFinite || amount <= 0) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Մուտքագրեք դրական գումար։')),
-            );
-            return;
-          }
-          Navigator.pop(
-            context,
-            TripExpense(
-              category: _category,
-              amount: amount,
-              description: _description.text.trim(),
-              date: _date,
-            ),
-          );
-        },
-        child: const Text('Պահպանել'),
-      ),
+      FilledButton(onPressed: _save, child: const Text('Պահպանել')),
     ],
   );
+}
+
+double? _parseMoney(String raw) {
+  var value = raw.trim().replaceAll(RegExp(r'[\s\u00A0]'), '');
+  if (value.isEmpty) return null;
+
+  if (value.contains(',') && value.contains('.')) {
+    value = value.replaceAll(',', '');
+  } else if (value.contains(',')) {
+    final lastComma = value.lastIndexOf(',');
+    final decimalDigits = value.length - lastComma - 1;
+    value = decimalDigits == 3
+        ? value.replaceAll(',', '')
+        : value.replaceAll(',', '.');
+  }
+
+  final amount = double.tryParse(value);
+  return amount != null && amount.isFinite ? amount : null;
 }
