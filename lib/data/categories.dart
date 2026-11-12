@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../models/place.dart';
 
-/// Category types for filtering places on the home screen
 enum CategoryType {
   mountains('Լեռներ', 'Լեռնային գյուղեր, գագաթներ և լեռնային փախուստներ', Icons.hiking_rounded, Color(0xFF2E7D32)),
   churches('Եկեղեցիներ', 'Եկեղեցիներ, վանքեր և սրբավայրեր', Icons.church_rounded, Color(0xFF6A1B9A)),
@@ -19,7 +18,6 @@ enum CategoryType {
   const CategoryType(this.label, this.description, this.icon, this.color);
 }
 
-/// Returns places that match the given category type
 List<Place> getPlacesByCategory(List<City> allCities, CategoryType type) {
   if (type == CategoryType.all) {
     final all = <Place>[];

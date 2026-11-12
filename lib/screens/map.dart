@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 import '../data/mock_places.dart';
 import '../data/mock_regions.dart';
 import '../models/place.dart';
 import '../services/favorites_service.dart';
 import '../services/location_service.dart';
 import '../services/map_service.dart';
+import '../services/routing_service.dart';
 import '../services/selected_places_service.dart';
 import 'place_details_screen.dart';
 
@@ -15,12 +17,16 @@ class MapScreen extends StatefulWidget {
   final Place? selectedPlace;
   final String? selectedCity;
   final String? selectedRegion;
+  final List<Place>? tripPlaces;
+  final String? tripName;
 
   const MapScreen({
     super.key,
     this.selectedPlace,
     this.selectedCity,
     this.selectedRegion,
+    this.tripPlaces,
+    this.tripName,
   });
 
   @override
@@ -39,6 +45,9 @@ class _MapScreenState extends State<MapScreen> {
   bool _mapReady = false;
   bool _loadingLocation = false;
   LatLng? _userLocation;
+  RouteResult? _tripRoute;
+  String? _tripRouteError;
+  bool _loadingTripRoute = false;
 
   List<_PlaceEntry> get _allEntries => [
     for (final city in cities)
@@ -67,6 +76,24 @@ class _MapScreenState extends State<MapScreen> {
       _region != 'Բոլոր մարզերը' || _city != 'Բոլոր քաղաքները';
 
   List<_PlaceEntry> get _markerEntries {
+    if (widget.tripPlaces != null) {
+      return [
+        for (final place in widget.tripPlaces!)
+          if (_valid(place))
+            _PlaceEntry(
+              place: place,
+              city:
+                  cities
+                      .where(
+                        (city) => city.places.any(
+                          (candidate) => candidate.id == place.id,
+                        ),
+                      )
+                      .firstOrNull ??
+                  cities.first,
+            ),
+      ];
+    }
     if (_locationFilterSelected) return _filteredEntries;
     if (_selectedPlace == null) return const [];
     return _allEntries
@@ -94,6 +121,28 @@ class _MapScreenState extends State<MapScreen> {
     _selectedPlace = widget.selectedPlace;
     _region = widget.selectedRegion ?? 'Բոլոր մարզերը';
     _city = widget.selectedCity ?? 'Բոլոր քաղաքները';
+    if (widget.tripPlaces != null && widget.tripPlaces!.length > 1) {
+      _loadTripRoute();
+    }
+  }
+
+  Future<void> _loadTripRoute() async {
+    setState(() {
+      _loadingTripRoute = true;
+      _tripRouteError = null;
+    });
+    try {
+      final route = await RoutingService.getRoute(
+        widget.tripPlaces!.where(_valid).map(_point).toList(),
+      );
+      if (!mounted) return;
+      setState(() => _tripRoute = route);
+    } on Exception catch (error) {
+      if (!mounted) return;
+      setState(() => _tripRouteError = error.toString());
+    } finally {
+      if (mounted) setState(() => _loadingTripRoute = false);
+    }
   }
 
   @override
@@ -115,7 +164,9 @@ class _MapScreenState extends State<MapScreen> {
 
   void _onMapReady() {
     _mapReady = true;
-    if (_selectedPlace != null && _valid(_selectedPlace!)) {
+    if (widget.tripPlaces != null && widget.tripPlaces!.isNotEmpty) {
+      _fitPlaces();
+    } else if (_selectedPlace != null && _valid(_selectedPlace!)) {
       _moveToPlace(_selectedPlace!, zoom: 14.5);
     } else if (widget.selectedCity != null || widget.selectedRegion != null) {
       _fitPlaces();
@@ -132,15 +183,31 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   void _fitPlaces() {
+    if (widget.tripPlaces != null) {
+      final points = widget.tripPlaces!.where(_valid).map(_point).toList();
+      if (points.isEmpty || !_mapReady) return;
+      if (points.length == 1) {
+        _mapController.move(points.single, 13);
+      } else {
+        _mapController.fitCamera(
+          CameraFit.bounds(
+            bounds: LatLngBounds.fromPoints(points),
+            padding: const EdgeInsets.fromLTRB(48, 100, 72, 150),
+            maxZoom: 12,
+          ),
+        );
+      }
+      return;
+    }
     if (!_locationFilterSelected && _selectedPlace == null) return;
     final visibleCities = cities.where(
-      (city) => _locationFilterSelected &&
+      (city) =>
+          _locationFilterSelected &&
           (_region == 'Բոլոր մարզերը' || city.region == _region) &&
           (_city == 'Բոլոր քաղաքները' || city.name == _city),
     );
     final visibleRegions = regions.where(
-      (region) =>
-          _region != 'Բոլոր մարզերը' && region.name == _region,
+      (region) => _region != 'Բոլոր մարզերը' && region.name == _region,
     );
     final points = <LatLng>[
       ...(_locationFilterSelected
@@ -222,7 +289,9 @@ class _MapScreenState extends State<MapScreen> {
       setState(() => _userLocation = point);
       if (_mapReady) _mapController.move(point, 14);
     } on LocationServiceDisabledException {
-      _showMessage('Միացրեք դիրքի ծառայությունները Իմ դիրքը օգտագործելու համար.');
+      _showMessage(
+        'Միացրեք դիրքի ծառայությունները Իմ դիրքը օգտագործելու համար.',
+      );
     } on LocationPermissionDeniedException {
       _showMessage(
         'Դիրքի թույլտվությունը մերժված է. սեղմեք Իմ դիրքը կրկին փորձելու համար.',
@@ -315,19 +384,38 @@ class _MapScreenState extends State<MapScreen> {
           child: _googleLocationPin(),
         ),
       ),
-    for (final entry in _markerEntries)
+    for (var index = 0; index < _markerEntries.length; index++)
       Marker(
-        point: _point(entry.place),
-        width: 32,
-        height: 36,
+        point: _point(_markerEntries[index].place),
+        width: widget.tripPlaces == null ? 32 : 40,
+        height: widget.tripPlaces == null ? 36 : 44,
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
-          onTap: () => _moveToPlace(entry.place, zoom: 14),
-          child: _googleLocationPin(
-            color: _selectedPlace?.id == entry.place.id
-                ? const Color(0xFFC5221F)
-                : const Color(0xFFEA4335),
-          ),
+          onTap: () => _moveToPlace(_markerEntries[index].place, zoom: 14),
+          child: widget.tripPlaces == null
+              ? _googleLocationPin(
+                  color: _selectedPlace?.id == _markerEntries[index].place.id
+                      ? const Color(0xFFC5221F)
+                      : const Color(0xFFEA4335),
+                )
+              : Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF17453D),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 2),
+                    boxShadow: const [
+                      BoxShadow(color: Colors.black26, blurRadius: 4),
+                    ],
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    '${index + 1}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
         ),
       ),
     if (_userLocation case final location?)
@@ -418,7 +506,9 @@ class _MapScreenState extends State<MapScreen> {
                   ),
                 ),
                 IconButton(
-                  tooltip: isFavorite ? 'Հեռացնել ընտրանիից' : 'Ավելացնել ընտրանի',
+                  tooltip: isFavorite
+                      ? 'Հեռացնել ընտրանիից'
+                      : 'Ավելացնել ընտրանի',
                   onPressed: () =>
                       setState(() => FavoritesService.toggleFavorite(place)),
                   icon: Icon(
@@ -463,7 +553,11 @@ class _MapScreenState extends State<MapScreen> {
                     isPinned ? Icons.push_pin : Icons.add_road,
                     size: 18,
                   ),
-                  label: Text(isPinned ? 'Ճանապարհորդությունում' : 'Ավելացնել ճանապարհորդությանը'),
+                  label: Text(
+                    isPinned
+                        ? 'Ճանապարհորդությունում'
+                        : 'Ավելացնել ճանապարհորդությանը',
+                  ),
                 ),
               ],
             ),
@@ -490,7 +584,10 @@ class _MapScreenState extends State<MapScreen> {
               .firstOrNull;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Զննել Հայաստանը'), centerTitle: true),
+      appBar: AppBar(
+        title: Text(widget.tripName ?? 'Զննել Հայաստանը'),
+        centerTitle: true,
+      ),
       body: Stack(
         children: [
           MouseRegion(
@@ -518,6 +615,21 @@ class _MapScreenState extends State<MapScreen> {
                   userAgentPackageName: 'com.example.first',
                   maxZoom: 19,
                 ),
+                if (widget.tripPlaces != null && widget.tripPlaces!.length > 1)
+                  PolylineLayer(
+                    polylines: [
+                      Polyline(
+                        points:
+                            _tripRoute?.geometry ??
+                            widget.tripPlaces!
+                                .where(_valid)
+                                .map(_point)
+                                .toList(),
+                        strokeWidth: 4,
+                        color: const Color(0xFF17453D),
+                      ),
+                    ],
+                  ),
                 MarkerLayer(markers: _buildMarkers().toList()),
                 RichAttributionWidget(
                   alignment: AttributionAlignment.bottomLeft,
@@ -548,7 +660,9 @@ class _MapScreenState extends State<MapScreen> {
                 onChanged: (value) => setState(() => _query = value.trim()),
                 onSubmitted: _search,
                 decoration: InputDecoration(
-                  hintText: 'Որոնել տեսարժան վայրեր',
+                  hintText: widget.tripPlaces == null
+                      ? 'Որոնել տեսարժան վայրեր'
+                      : 'Ուղղություններ · ${widget.tripPlaces!.length}',
                   prefixIcon: const Icon(Icons.search),
                   suffixIcon: _query.isEmpty
                       ? null
@@ -565,66 +679,141 @@ class _MapScreenState extends State<MapScreen> {
               ),
             ),
           ),
-          Positioned(
-            top: 72,
-            left: 12,
-            right: 12,
-            child: Row(
-              children: [
-                Expanded(
-                  child: _filterDropdown(_region, _regions, _selectRegion),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: _filterDropdown(_city, _cityOptions, _selectCity),
-                ),
-              ],
-            ),
-          ),
-          Positioned(
-            top: 126,
-            right: 12,
-            child: Column(
-              children: [
-                _floatingButton(
-                  Icons.add,
-                  'Մեծացնել',
-                  () => _mapController.move(
-                    _mapController.camera.center,
-                    _mapController.camera.zoom + 1,
+          if (widget.tripPlaces == null)
+            Positioned(
+              top: 72,
+              left: 12,
+              right: 12,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _filterDropdown(_region, _regions, _selectRegion),
                   ),
-                ),
-                const SizedBox(height: 8),
-                _floatingButton(
-                  Icons.remove,
-                  'Փոքրացնել',
-                  () => _mapController.move(
-                    _mapController.camera.center,
-                    _mapController.camera.zoom - 1,
+                  if (widget.tripPlaces != null &&
+                      widget.tripPlaces!.length > 1)
+                    Positioned(
+                      top: 68,
+                      left: 12,
+                      right: 12,
+                      child: Card(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 10,
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                _tripRouteError == null
+                                    ? Icons.alt_route
+                                    : Icons.route_outlined,
+                                color: _tripRouteError == null
+                                    ? const Color(0xFF17453D)
+                                    : Colors.deepOrange,
+                              ),
+                              const SizedBox(width: 9),
+                              Expanded(
+                                child: Text(
+                                  _loadingTripRoute
+                                      ? 'Հաշվարկվում է երթուղին…'
+                                      : _tripRouteError != null
+                                      ? 'Երթուղին հասանելի չէ. $_tripRouteError'
+                                      : '${(_tripRoute!.distanceMeters / 1000).toStringAsFixed(1)} կմ · մոտ ${(_tripRoute!.durationSeconds / 60).round()} րոպե · մեքենայով',
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: _tripRouteError == null
+                                        ? Colors.black87
+                                        : Colors.deepOrange,
+                                  ),
+                                ),
+                              ),
+                              if (_loadingTripRoute)
+                                const SizedBox(
+                                  width: 17,
+                                  height: 17,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                ),
+                              if (_tripRouteError != null)
+                                IconButton(
+                                  tooltip: 'Կրկին փորձել',
+                                  onPressed: _loadTripRoute,
+                                  icon: const Icon(Icons.refresh),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: _filterDropdown(_city, _cityOptions, _selectCity),
                   ),
-                ),
-                const SizedBox(height: 8),
-                _floatingButton(
-                  Icons.my_location,
-                  'Իմ դիրքը',
-                  _showMyLocation,
-                ),
-                const SizedBox(height: 8),
-                _floatingButton(Icons.public, 'Ցույց տալ բոլոր վայրերը', _fitPlaces),
-                const SizedBox(height: 8),
-                _floatingButton(Icons.home, 'Կենտրոնացնել Հայաստանը', () {
-                  setState(() {
-                    _region = 'Բոլոր մարզերը';
-                    _city = 'Բոլոր քաղաքները';
-                    _query = '';
-                    _selectedPlace = null;
-                    _searchController.clear();
-                  });
-                  if (_mapReady) _mapController.move(_armeniaCenter, 7.2);
-                }),
-              ],
+                ],
+              ),
             ),
-          ),
+          if (widget.tripPlaces == null)
+            Positioned(
+              top: 126,
+              right: 12,
+              child: Column(
+                children: [
+                  _floatingButton(
+                    Icons.add,
+                    'Մեծացնել',
+                    () => _mapController.move(
+                      _mapController.camera.center,
+                      _mapController.camera.zoom + 1,
+                    ),
+                  ),
+                  if (widget.tripPlaces != null)
+                    Positioned(
+                      top: 126,
+                      right: 12,
+                      child: _floatingButton(
+                        Icons.my_location,
+                        'Իմ դիրքը',
+                        _showMyLocation,
+                      ),
+                    ),
+                  const SizedBox(height: 8),
+                  _floatingButton(
+                    Icons.remove,
+                    'Փոքրացնել',
+                    () => _mapController.move(
+                      _mapController.camera.center,
+                      _mapController.camera.zoom - 1,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  _floatingButton(
+                    Icons.my_location,
+                    'Իմ դիրքը',
+                    _showMyLocation,
+                  ),
+                  const SizedBox(height: 8),
+                  _floatingButton(
+                    Icons.public,
+                    'Ցույց տալ բոլոր վայրերը',
+                    _fitPlaces,
+                  ),
+                  const SizedBox(height: 8),
+                  _floatingButton(Icons.home, 'Կենտրոնացնել Հայաստանը', () {
+                    setState(() {
+                      _region = 'Բոլոր մարզերը';
+                      _city = 'Բոլոր քաղաքները';
+                      _query = '';
+                      _selectedPlace = null;
+                      _searchController.clear();
+                    });
+                    if (_mapReady) _mapController.move(_armeniaCenter, 7.2);
+                  }),
+                ],
+              ),
+            ),
           if (selectedEntry != null)
             Positioned(
               left: 12,

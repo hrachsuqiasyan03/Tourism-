@@ -21,3 +21,9 @@ samples, guidance on mobile development, and a full API reference.
 The in-app map uses OpenStreetMap tiles through `flutter_map`; it does not need a Google Maps API key. An internet connection is required for map tiles. The map displays OpenStreetMap contributor attribution and filters markers using the existing city and place data.
 
 Run `flutter pub get`, then `flutter run`. Location is requested only when **My Location** is tapped. iOS uses the location prompt in `Info.plist`; Android uses the standard foreground location permission.
+
+## Trip planner
+
+The Trips tab reuses the existing Armenian place catalog and OpenStreetMap map. Trips support date and preference setup, per-day destination selection and reordering, visit times and notes, expense tracking in AMD, and trip sharing by copying a text itinerary. Driving routes are requested from the public OSRM demo service when a trip map is opened; a failed request is shown in the map rather than silently treated as a road route.
+
+This project currently has no trip backend API. Trip data is kept in memory for the current app session and is **not permanently saved**.
