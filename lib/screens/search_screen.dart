@@ -105,119 +105,122 @@ class _SearchScreenState extends State<SearchScreen> {
             Expanded(
               child: isQueryEmpty
                   ? (history.isEmpty
-                      ? Center(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.search,
-                                size: 64,
-                                color: Colors.grey.shade400,
-                              ),
-                              const SizedBox(height: 12),
-                              Text(
-                                'Որոնեք քաղաքներ կամ վայրեր',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.grey.shade700,
-                                ),
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                'Ձեր որոնման պատմությունը կհայտնվի այստեղ',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.grey.shade500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        )
-                      : Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        ? Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Text(
-                                  'Վերջին որոնումները',
+                                Icon(
+                                  Icons.search,
+                                  size: 64,
+                                  color: Colors.grey.shade400,
+                                ),
+                                const SizedBox(height: 12),
+                                Text(
+                                  'Որոնեք քաղաքներ կամ վայրեր',
                                   style: TextStyle(
                                     fontSize: 18,
-                                    fontWeight: FontWeight.bold,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.grey.shade700,
                                   ),
                                 ),
-                                TextButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      SearchHistoryService.clearHistory();
-                                    });
-                                  },
-                                  child: const Text('Ջնջել բոլորը'),
+                                const SizedBox(height: 6),
+                                Text(
+                                  'Ձեր որոնման պատմությունը կհայտնվի այստեղ',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey.shade500,
+                                  ),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 8),
-                            Expanded(
-                              child: ListView.separated(
-                                itemCount: history.length,
-                                separatorBuilder: (context, index) =>
-                                    const Divider(height: 1),
-                                itemBuilder: (context, index) {
-                                  final item = history[index];
-                                  return ListTile(
-                                    contentPadding: EdgeInsets.zero,
-                                    leading: const Icon(
-                                      Icons.history,
-                                      color: Colors.grey,
+                          )
+                        : Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text(
+                                    'Վերջին որոնումները',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
                                     ),
-                                    title: Text(item),
-                                    trailing: IconButton(
-                                      icon: const Icon(
-                                        Icons.close,
-                                        size: 20,
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        SearchHistoryService.clearHistory();
+                                      });
+                                    },
+                                    child: const Text('Ջնջել բոլորը'),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                              Expanded(
+                                child: ListView.separated(
+                                  itemCount: history.length,
+                                  separatorBuilder: (context, index) =>
+                                      const Divider(height: 1),
+                                  itemBuilder: (context, index) {
+                                    final item = history[index];
+                                    return ListTile(
+                                      contentPadding: EdgeInsets.zero,
+                                      leading: const Icon(
+                                        Icons.history,
                                         color: Colors.grey,
                                       ),
-                                      onPressed: () {
-                                        setState(() {
-                                          SearchHistoryService.removeQuery(item);
-                                        });
-                                      },
+                                      title: Text(item),
+                                      trailing: IconButton(
+                                        icon: const Icon(
+                                          Icons.close,
+                                          size: 20,
+                                          color: Colors.grey,
+                                        ),
+                                        onPressed: () {
+                                          setState(() {
+                                            SearchHistoryService.removeQuery(
+                                              item,
+                                            );
+                                          });
+                                        },
+                                      ),
+                                      onTap: () => _selectHistoryItem(item),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          ))
+                  : (filteredPlaces.isEmpty
+                        ? const Center(
+                            child: Text(
+                              'Ոչ մի ուղղություն չի գտնվել',
+                              style: TextStyle(fontSize: 18),
+                            ),
+                          )
+                        : ListView.builder(
+                            itemCount: filteredPlaces.length,
+                            itemBuilder: (context, index) {
+                              final place = filteredPlaces[index];
+
+                              return PlaceCard(
+                                place: place,
+                                onTap: () {
+                                  SearchHistoryService.addQuery(query);
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          PlaceDetailsScreen(place: place),
                                     ),
-                                    onTap: () => _selectHistoryItem(item),
                                   );
                                 },
-                              ),
-                            ),
-                          ],
-                        ))
-                  : (filteredPlaces.isEmpty
-                      ? const Center(
-                          child: Text(
-                            'Ոչ մի ուղղություն չի գտնվել',
-                            style: TextStyle(fontSize: 18),
-                          ),
-                        )
-                      : ListView.builder(
-                          itemCount: filteredPlaces.length,
-                          itemBuilder: (context, index) {
-                            final place = filteredPlaces[index];
-
-                            return PlaceCard(
-                              place: place,
-                              onTap: () {
-                                SearchHistoryService.addQuery(query);
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        PlaceDetailsScreen(place: place),
-                                  ),
-                                );
-                              },
-                            );
-                          },
-                        )),
+                              );
+                            },
+                          )),
             ),
           ],
         ),

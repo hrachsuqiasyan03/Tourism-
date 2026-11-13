@@ -3,12 +3,42 @@ import 'package:flutter/material.dart';
 import '../models/place.dart';
 
 enum CategoryType {
-  mountains('Լեռներ', 'Լեռնային գյուղեր, գագաթներ և լեռնային փախուստներ', Icons.hiking_rounded, Color(0xFF2E7D32)),
-  churches('Եկեղեցիներ', 'Եկեղեցիներ, վանքեր և սրբավայրեր', Icons.church_rounded, Color(0xFF6A1B9A)),
-  lakes('Լճեր և գետեր', 'Լճեր, գետեր և ջրային ուղղություններ', Icons.water_rounded, Color(0xFF1565C0)),
-  culture('Մշակույթ', 'Միջազմային, հրապարակներ և մշակութային հուշարձաններ', Icons.museum_rounded, Color(0xFFE65100)),
-  nature('Բնություն', 'Անտառներ և բնության հրաշալիքներ', Icons.park_rounded, Color(0xFF00838F)),
-  all('Բոլոր վայրերը', 'Զննեք Հայաստանի բոլոր առաջարկները', Icons.explore_rounded, Color(0xFF17453D));
+  mountains(
+    'Լեռներ',
+    'Լեռնային գյուղեր, գագաթներ և լեռնային փախուստներ',
+    Icons.hiking_rounded,
+    Color(0xFF2E7D32),
+  ),
+  churches(
+    'Եկեղեցիներ',
+    'Եկեղեցիներ, վանքեր և սրբավայրեր',
+    Icons.church_rounded,
+    Color(0xFF6A1B9A),
+  ),
+  lakes(
+    'Լճեր և գետեր',
+    'Լճեր, գետեր և ջրային ուղղություններ',
+    Icons.water_rounded,
+    Color(0xFF1565C0),
+  ),
+  culture(
+    'Մշակույթ',
+    'Միջազմային, հրապարակներ և մշակութային հուշարձաններ',
+    Icons.museum_rounded,
+    Color(0xFFE65100),
+  ),
+  nature(
+    'Բնություն',
+    'Անտառներ և բնության հրաշալիքներ',
+    Icons.park_rounded,
+    Color(0xFF00838F),
+  ),
+  all(
+    'Բոլոր վայրերը',
+    'Զննեք Հայաստանի բոլոր առաջարկները',
+    Icons.explore_rounded,
+    Color(0xFF17453D),
+  );
 
   final String label;
   final String description;
@@ -31,17 +61,19 @@ List<Place> getPlacesByCategory(List<City> allCities, CategoryType type) {
   for (final city in allCities) {
     for (final place in city.places) {
       if (_matchesCategory(place, type)) {
-        all.add(Place(
-          id: place.id,
-          name: place.name,
-          type : place.type,
-          description: place.description,
-          imagePath: place.imagePath,
-          latitude: place.latitude,
-          longitude: place.longitude,
-          rating: place.rating,
-          city: city.name,
-        ));
+        all.add(
+          Place(
+            id: place.id,
+            name: place.name,
+            type: place.type,
+            description: place.description,
+            imagePath: place.imagePath,
+            latitude: place.latitude,
+            longitude: place.longitude,
+            rating: place.rating,
+            city: city.name,
+          ),
+        );
       }
     }
   }
@@ -61,8 +93,7 @@ bool _matchesCategory(Place place, CategoryType type) {
           placeType == 'տաճար';
 
     case CategoryType.lakes:
-      return placeType == 'լիճ' ||
-          placeType == 'գետ';
+      return placeType == 'լիճ' || placeType == 'գետ';
 
     case CategoryType.culture:
       return placeType == 'թանգարան' ||

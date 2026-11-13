@@ -1,17 +1,29 @@
 import 'package:flutter/material.dart';
 
 import 'main_screen.dart';
-import 'register_screen.dart';
 import 'map.dart';
+import 'register_screen.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final emailController = TextEditingController();
-    final passwordController = TextEditingController();
+  State<LoginScreen> createState() => _LoginScreenState();
+}
 
+class _LoginScreenState extends State<LoginScreen> {
+  final _email = TextEditingController();
+  final _password = TextEditingController();
+
+  @override
+  void dispose() {
+    _email.dispose();
+    _password.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
         child: Center(
@@ -63,7 +75,7 @@ class LoginScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 22),
                           TextField(
-                            controller: emailController,
+                            controller: _email,
                             decoration: const InputDecoration(
                               labelText: 'Էլ. փոստ',
                               prefixIcon: Icon(Icons.mail_outline_rounded),
@@ -71,8 +83,9 @@ class LoginScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 14),
                           TextField(
-                            controller: passwordController,
+                            controller: _password,
                             obscureText: true,
+                            autofillHints: const [AutofillHints.password],
                             decoration: const InputDecoration(
                               labelText: 'Գաղտնաբառ',
                               prefixIcon: Icon(Icons.lock_outline_rounded),

@@ -7,6 +7,7 @@ import '../services/trip_repository.dart';
 import 'create_trip_screen.dart';
 import 'destination_selection_screen.dart';
 import 'place_details_screen.dart';
+import 'trip_map_screen.dart';
 
 class TripDetailsScreen extends StatefulWidget {
   const TripDetailsScreen({super.key, required this.trip});
@@ -62,6 +63,19 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
       ),
     );
     if (mounted) setState(() {});
+  }
+
+  Future<void> _openTripMap() async {
+    if (_trip.places.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Քարտեզում ցույց տալու վայրեր դեռ չկան։')),
+      );
+      return;
+    }
+    await Navigator.push<void>(
+      context,
+      MaterialPageRoute(builder: (_) => TripMapScreen(trip: _trip)),
+    );
   }
 
   Future<void> _editTrip() async {
@@ -304,6 +318,11 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
       title: Text(_trip.name, maxLines: 1, overflow: TextOverflow.ellipsis),
       actions: [
         IconButton(
+          tooltip: 'Ուղղությունները քարտեզում',
+          onPressed: _openTripMap,
+          icon: const Icon(Icons.map_outlined),
+        ),
+        IconButton(
           tooltip: 'Խմբագրել',
           onPressed: _editTrip,
           icon: const Icon(Icons.edit_outlined),
@@ -313,6 +332,17 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
     body: Column(
       children: [
         _tripHeader(),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
+          child: SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: _openTripMap,
+              icon: const Icon(Icons.directions_outlined),
+              label: const Text('Դիտել ուղղությունները քարտեզում'),
+            ),
+          ),
+        ),
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
           child: SegmentedButton<int>(
@@ -697,9 +727,11 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'Ճանապարհորդության բյուջե',
-                    style: TextStyle(fontWeight: FontWeight.w700),
+                  const Expanded(
+                    child: Text(
+                      'Ճանապարհորդության բյուջե',
+                      style: TextStyle(fontWeight: FontWeight.w700),
+                    ),
                   ),
                   IconButton(
                     onPressed: _setBudget,

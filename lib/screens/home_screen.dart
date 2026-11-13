@@ -276,7 +276,9 @@ class _HomeScreenState extends State<HomeScreen> {
               const SliverToBoxAdapter(
                 child: Padding(
                   padding: EdgeInsets.all(28),
-                  child: Center(child: Text('Ոչ մի մարզ չի համապատասխանում որոնմանը.')),
+                  child: Center(
+                    child: Text('Ոչ մի մարզ չի համապատասխանում որոնմանը.'),
+                  ),
                 ),
               )
             else
@@ -369,14 +371,20 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Icon(category.icon, size: 26, color: category.color),
+                              Icon(
+                                category.icon,
+                                size: 26,
+                                color: category.color,
+                              ),
                               const SizedBox(height: 6),
                               Text(
                                 category.label,
                                 style: TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w800,
-                                  color: isSelected ? category.color : const Color(0xFF202925),
+                                  color: isSelected
+                                      ? category.color
+                                      : const Color(0xFF202925),
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -546,7 +554,7 @@ class _PlaceCard extends StatelessWidget {
                     Image.asset(
                       place.imagePath,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Container(
+                      errorBuilder: (_, _, _) => Container(
                         color: const Color(0xFFE6E8E2),
                         child: const Icon(
                           Icons.place_outlined,
@@ -570,7 +578,11 @@ class _PlaceCard extends StatelessWidget {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(Icons.star_rounded, size: 11, color: Color(0xFFFFB300)),
+                            const Icon(
+                              Icons.star_rounded,
+                              size: 11,
+                              color: Color(0xFFFFB300),
+                            ),
                             const SizedBox(width: 2),
                             Text(
                               '${place.rating}',
@@ -639,7 +651,7 @@ class _RegionCard extends StatelessWidget {
                 Image.asset(
                   region.imagePath,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Container(
+                  errorBuilder: (_, _, _) => Container(
                     color: const Color(0xFFE6E8E2),
                     child: const Icon(
                       Icons.landscape_outlined,

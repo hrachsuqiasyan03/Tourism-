@@ -352,9 +352,12 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
                   color: _forest,
                 ),
                 const SizedBox(width: 7),
-                Text(
-                  value,
-                  style: const TextStyle(fontWeight: FontWeight.w700),
+                Expanded(
+                  child: Text(
+                    value,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontWeight: FontWeight.w700),
+                  ),
                 ),
               ],
             ),

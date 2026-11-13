@@ -24,8 +24,8 @@ Run `flutter pub get`, then `flutter run`. Location is requested only when **My 
 
 ## Trip planner
 
-The Trips tab reuses the existing Armenian place catalog. Trips support date and preference setup, per-day destination selection and reordering, visit times and notes, expense tracking in AMD, and trip sharing by copying a text itinerary. The Trips screens do not include map or route functionality; the existing standalone map remains available in the main navigation.
+The Trips tab reuses the existing Armenian place catalog. Trips support date and preference setup, per-day destination selection and reordering, visit times and notes, expense tracking in AMD, itinerary sharing by copying text, and a trip map with numbered destinations and optional driving routes via OSRM/OpenStreetMap.
 
-The Trips dashboard also offers guided trip generation: choose an interest category, Armenian region, trip duration, and total AMD budget to create a day-by-day itinerary from matching catalog destinations ordered by geographic proximity.
+The Trips dashboard also offers guided trip generation: choose one or more interest categories and Armenian regions, trip duration, and total AMD budget to create a day-by-day itinerary from matching catalog destinations ordered by geographic proximity.
 
 This project currently has no trip backend API. Trip data is kept in memory for the current app session and is **not permanently saved**.
