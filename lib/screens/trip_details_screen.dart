@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../data/app_locale.dart';
 import '../models/trip.dart';
 import '../services/trip_repository.dart';
 import 'create_trip_screen.dart';
@@ -223,7 +224,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
               SimpleDialogOption(
                 onPressed: () => Navigator.pop(context, index),
                 child: Text(
-                  '${_trip.days[index].dayNumber}-րդ օր · ${_date(_trip.days[index].date)}',
+                  '${AppLocale.ordinalNumber(_trip.days[index].dayNumber)} օր · ${_date(_trip.days[index].date)}',
                 ),
               ),
           ],
@@ -475,7 +476,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                 selected: _dayIndex == index,
                 onSelected: (_) => setState(() => _dayIndex = index),
                 label: Text(
-                  'ՕՐ ${item.dayNumber}  ·  ${_date(item.date)}   (${item.places.length})',
+                  '${AppLocale.ordinalNumber(item.dayNumber)} օր  ·  ${_date(item.date)}   (${item.places.length})',
                 ),
                 selectedColor: const Color(0xFFDCEAE3),
               );

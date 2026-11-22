@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../data/app_locale.dart';
 import '../models/trip.dart';
 import '../services/trip_repository.dart';
 import 'create_trip_screen.dart';
@@ -75,7 +76,9 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
       ..writeln()
       ..writeln('Օրակարգ');
     for (final day in trip.days) {
-      text.writeln('Օր ${day.dayNumber} · ${_date(day.date)}');
+      text.writeln(
+        '${AppLocale.ordinalNumber(day.dayNumber)} օր · ${_date(day.date)}',
+      );
       for (final visit in day.places) {
         text.writeln(
           '  ${TimeOfDay.fromDateTime(visit.arrivalTime).format(context)} — ${visit.place.name}',

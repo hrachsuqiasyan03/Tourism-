@@ -3,13 +3,17 @@
 class AppLocale {
   AppLocale._();
 
+  static String ordinalNumber(int number) =>
+      '$number-${number == 1 ? 'ին' : 'րդ'}';
+
   // --- Splash Screen ---
   static const appTitle = 'ArmTravel';
   static const discoverSoul = 'Գտեք Հայաստանի հոգին';
 
   // --- Login Screen ---
   static const welcomeBack = 'Բարի գալուստ';
-  static const signInSubtitle = 'Մուտք գործեք և շարունակեք ձեր ճանապարհորդությունը:';
+  static const signInSubtitle =
+      'Մուտք գործեք և շարունակեք ձեր ճանապարհորդությունը:';
   static const emailLabel = 'Էլ. փոստ';
   static const passwordLabel = 'Գաղտնաբառ';
   static const signIn = 'Մուտք';
@@ -32,16 +36,19 @@ class AppLocale {
   // --- Home Screen ---
   static const exploreByCategory = 'ԶՆՆԵԼ ՈՒՂՂՈՒԹՅՈՒՆՆԵՐԸ ըստ տեսակի';
   static const allDestinations = 'Բոլոր ուղղությունները';
-  static const exploreMarzes = 'Զննեք 11 մարզերը՝ ալպյան լճերից մինչև հնագույն վանքեր:';
+  static const exploreMarzes =
+      'Զննեք 11 մարզերը՝ ալպյան լճերից մինչև հնագույն վանքեր:';
   static const noRegionsMatch = 'Ոչ մի մարզ չի համապատասխանում որոնմանը:';
   static const noPlacesFound = 'Ոչ մի վայր չի գտնվել';
   static const searchHint = 'Որոնել վայրեր, քաղաքներ կամ մարզեր';
   static const searchIn = 'Որոնել'; // used with category: "Որոնել [տեսակ]"
   static const landOfStories = 'ԻՐԱՎՈՒՆՔՆԵՐԻ ԵՐԿԻՐ';
   static const discoverSoulHero = 'Գտեք հոգին\nՀայաստանի';
-  static const mountainsMemories = 'Լեռներ, հիշողություններ և պահեր, որոնք մնում են ձեզ հետ:';
+  static const mountainsMemories =
+      'Լեռներ, հիշողություններ և պահեր, որոնք մնում են ձեզ հետ:';
   static const exploreDestinations = 'Զննել ուղղությունները';
-  static const findYourWay = 'Գտեք ձեր ճանապարհը Հայաստանում՝ մեկ յուրահատուկ վայրից մեկ այլ:';
+  static const findYourWay =
+      'Գտեք ձեր ճանապարհը Հայաստանում՝ մեկ յուրահատուկ վայրից մեկ այլ:';
   static const destinations = 'ՈՒՂՂՈՒԹՅՈՒՆՆԵՐ';
   static const aboutArmenia = 'ՀԱՅԱՍՏԱՆԻ ՄԱՍԻՆ';
   static const planYourTrip = 'ՁԵՐ ՃԱՆԱՊԱՐՀՈՐԴՈՒԹՅՈՒՆԸ';
@@ -53,13 +60,15 @@ class AppLocale {
 
   // --- Categories (labels + descriptions) ---
   static const mountains = 'Լեռներ';
-  static const mountainsDesc = 'Լեռնային գյուղեր, գագաթներ և լեռնային փախուստներ';
+  static const mountainsDesc =
+      'Լեռնային գյուղեր, գագաթներ և լեռնային փախուստներ';
   static const churches = 'Եկեղեցիներ';
   static const churchesDesc = 'Եկեղեցիներ, վանքեր և սրբավայրեր';
   static const lakes = 'Լճեր';
   static const lakesDesc = 'Լճեր, գետեր և ջրային ուղղություններ';
   static const culture = 'Մշակույթ';
-  static const cultureDesc = 'Միջազմային, հրապարակներ և մշակութային հուշարձաններ';
+  static const cultureDesc =
+      'Միջազմային, հրապարակներ և մշակութային հուշարձաններ';
   static const nature = 'Բնություն';
   static const natureDesc = 'Գետափեր, անտառներ և բնության հրաշալիքներ';
   static const allPlaces = 'Բոլոր վայրերը';
@@ -131,13 +140,16 @@ class AppLocale {
   static const tripNameLabel = 'Ճանապարհորդության անունը';
   static const selectDestinations = 'Ընտրել ուղղություններ';
   static const saveTrip = 'Պահպանել ճանապարհորդությունը';
-  static const enterTripName = 'Խնդրում ենք մուտքագրել ճանապարհորդության անունը';
+  static const enterTripName =
+      'Խնդրում ենք մուտքագրել ճանապարհորդության անունը';
 
   // --- Trip Details Screen ---
   static const viewAllOnMap = 'Դիտել բոլոր ուղղությունները քարտեզում';
-  static const directionsToFirst = 'Ուղղություններ առաջին կետ OpenStreetMap-ում';
+  static const directionsToFirst =
+      'Ուղղություններ առաջին կետ OpenStreetMap-ում';
   static const destinationsInTrip = 'Ուղղություններ այս ճանապարհորդությունում';
-  static const noPlacesInTrip = 'Ոչ մի վայր չի ավելացվել այս ճանապարհորդությանը:';
+  static const noPlacesInTrip =
+      'Ոչ մի վայր չի ավելացվել այս ճանապարհորդությանը:';
   static const viewTripOnMap = 'Դիտել ճանապարհորդությունը քարտեզում';
   static const dates = 'Ամսաթվեր';
 }
