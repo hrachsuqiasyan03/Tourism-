@@ -82,10 +82,10 @@ class _TripMapScreenState extends State<TripMapScreen> {
       final geometry = <LatLng>[];
 
       for (var index = 0; index < visits.length - 1; index++) {
-        final segment = await RoutingService.getDrivingRoute([
+        final segment = await RoutingService.getArmeniaDrivingRoute(
           _point(visits[index]),
           _point(visits[index + 1]),
-        ]);
+        );
         totalDistance += segment.distanceMeters;
         totalDuration += segment.durationSeconds;
 

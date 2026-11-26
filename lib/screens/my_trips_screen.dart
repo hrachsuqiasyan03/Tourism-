@@ -205,13 +205,6 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
         );
       },
     ),
-    floatingActionButton: FloatingActionButton.extended(
-      onPressed: _createTrip,
-      backgroundColor: _forest,
-      foregroundColor: Colors.white,
-      icon: const Icon(Icons.add),
-      label: const Text('Ստեղծել ուղևորություն'),
-    ),
   );
 
   Widget _summary(List<Trip> trips) {

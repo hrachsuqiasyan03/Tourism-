@@ -340,71 +340,63 @@ class _HomeScreenState extends State<HomeScreen> {
               child: SizedBox(
                 width: 150,
                 child: Card(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(18),
-                      border: isSelected
-                          ? Border.all(color: category.color, width: 2.5)
-                          : null,
-                    ),
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        // Colored top bar
-                        Positioned(
-                          top: 0,
-                          left: 0,
-                          right: 0,
-                          height: 4,
-                          child: DecoratedBox(
-                            decoration: BoxDecoration(
-                              color: category.color,
-                              borderRadius: const BorderRadius.vertical(
-                                top: Radius.circular(18),
-                              ),
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      // Colored top bar
+                      Positioned(
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        height: 4,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: category.color,
+                            borderRadius: const BorderRadius.vertical(
+                              top: Radius.circular(18),
                             ),
                           ),
                         ),
-                        // Content
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Icon(
-                                category.icon,
-                                size: 26,
-                                color: category.color,
+                      ),
+                      // Content
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(
+                              category.icon,
+                              size: 26,
+                              color: category.color,
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              category.label,
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w800,
+                                color: isSelected
+                                    ? category.color
+                                    : const Color(0xFF202925),
                               ),
-                              const SizedBox(height: 6),
-                              Text(
-                                category.label,
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w800,
-                                  color: isSelected
-                                      ? category.color
-                                      : const Color(0xFF202925),
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              category.description,
+                              style: const TextStyle(
+                                fontSize: 10,
+                                color: _muted,
+                                height: 1.3,
                               ),
-                              const SizedBox(height: 2),
-                              Text(
-                                category.description,
-                                style: const TextStyle(
-                                  fontSize: 10,
-                                  color: _muted,
-                                  height: 1.3,
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
-                          ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
